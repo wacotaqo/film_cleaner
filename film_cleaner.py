@@ -34,7 +34,7 @@ SEP_SKIPLIST = '[]()'
 
 def log(msg):
     if VAR_LOG_VERBOSE:
-        print msg
+        print(msg)
 
 def is_seperator(part_info):
     return part_info in (SEP_KEEP, SEP_SKIP)
@@ -50,7 +50,7 @@ def find_cd_counter(filename_parts, filename_parts_info):
             part_len = len(part)
             can_be_number = part[2:]
             num_formatter = '%%0%dd'%(part_len-2)
-            log('FindCounter: Part %s in %s -> %s in %s'%(part, filename_parts, can_be_number, part))
+            print('FindCounter: Part %s in %s -> %s in %s'%(part, filename_parts, can_be_number, part))
             try:
                 can_be_number_recalc = num_formatter%(int(can_be_number))
                 if can_be_number_recalc == can_be_number:
@@ -134,7 +134,7 @@ def find_seperators(filename, filename_parts):
             seperators = seperators[:pindex] + seperators[pindex+plen:]
     seperators = list(seperators)
     seperators = [sep if not sep in SEP_SKIPLIST else ' ' for sep in seperators ]
-    log('FindSeperator - Found: %s'%str(seperators))
+    print('FindSeperator - Found: %s'%str(seperators))
 
     # Then Find the common  seperator and ignore that
     # Approve the uncommon seperators
@@ -156,7 +156,7 @@ def analyse_filename(filename):
 
     import re
 
-    log('Analyse filename: %s'%filename)
+    print('Analyse filename: %s'%filename)
 
     splitter = re.compile(r"[a-zA-Z0-9\']+") # Old version = re.compile(r"\w+")
     filename_parts = splitter.findall(filename)
@@ -175,9 +175,9 @@ def analyse_filename(filename):
 
     finders = [find_year, find_cd_counter, find_film_terms, find_ok_text]
     for finder in finders:
-        log("Analyse filename: Calling %s with %s - %s"%(finder, all_parts, all_info))
+        print("Analyse filename: Calling %s with %s - %s"%(finder, all_parts, all_info))
         filename_parts_info = finder(all_parts, all_info)
-        log("Analyse filename: found %s"%(all_info))
+        print("Analyse filename: found %s"%(all_info))
 
     for index in range(0, len(all_parts)):
         if filename_parts_info[index] == PART_TEXT:
@@ -185,7 +185,7 @@ def analyse_filename(filename):
             if all_parts[index][0].islower():
                 all_parts[index] = all_parts[index].capitalize()
 
-    log('Analyse filename: Before Cleaning: %s, %s'%(all_parts, all_info))
+    print('Analyse filename: Before Cleaning: %s, %s'%(all_parts, all_info))
 
     clean_parts_and_info = filter_out_parts(all_parts, all_info, (SEP_SKIP, PART_UNKNOWN, PART_FILMTERM))
     new_filename = ''
@@ -193,7 +193,7 @@ def analyse_filename(filename):
 
     # Look through the clean parts to combined to make the filename
     for (part, part_type) in clean_parts_and_info:
-        #print "START:", new_filename, time_for_seperator, part, part_type
+        #print("START:", new_filename, time_for_seperator, part, part_type
         if part_type == PART_EXTENSION:
             new_filename += '.' + part
             break #Stop after extension
@@ -211,12 +211,12 @@ def analyse_filename(filename):
             if not is_seperator(part_type):
                 new_filename += part
             else:
-                print "Strange, 2 seperators in a row. Check this:"
-                print "   %s"%clean_parts_and_info
+                print("Strange, 2 seperators in a row. Check this:")
+                print("   %s"%clean_parts_and_info)
 
 
         time_for_seperator = not time_for_seperator # Toggle switch between seperator and not seperator
-        #print "END:", new_filename, time_for_seperator, part, part_type
+        #print("END:", new_filename, time_for_seperator, part, part_type
 
     return new_filename
 
@@ -232,31 +232,31 @@ def handle_file(filenamefull):
         fileext = fileext[1:]
 
     if not fileext in FILM_EXTENSIONS:
-        #print "File is not a film. Skipping: %s"%filenamefull
+        #print("File is not a film. Skipping: %s"%filenamefull
         return RESULT_SKIPPED
     
     filename_analysed = analyse_filename(filename)
-    if filename <> filename_analysed and len(filename_analysed) > 6:
+    if filename != filename_analysed and len(filename_analysed) > 6:
         
         if VAR_APPLY_SUGGESTIONS:
-            print " Changing from: %s"% filename
-            print " ------------>  %s"% filename_analysed
+            print(" Changing from: %s"% filename)
+            print(" ------------>  %s"% filename_analysed)
 
             from_file = os.path.join(VAR_STARTDIR, filename)
             to_file = os.path.join(VAR_STARTDIR, filename_analysed)
 
-            #print "Move from %s to %s"%(from_file, to_file)
+            #print("Move from %s to %s"%(from_file, to_file)
             shutil.move(from_file, to_file)
             return RESULT_CHANGED
         else:
-            print " Suggest from: %s"% filename
-            print " ----------->  %s"% filename_analysed
+            print(" Suggest from: %s"% filename)
+            print(" ----------->  %s"% filename_analysed)
             return RESULT_CHANGES_FOUND
 
     return RESULT_NO_CHANGES_FOUND
 
 def handle_dir(dirname):
-    print "DIR: %s"%dirname
+    print("DIR: %s"%dirname)
 
 def match_filter(filename, filenamefilter):
     filename = filename.lower()
@@ -280,7 +280,7 @@ def clean_filmnames_in_folder(args):
     if os.path.isdir(startdir_suggestion):
         VAR_STARTDIR = startdir_suggestion
     else:
-        print "This is not a valid directory name: %s"%startdir_suggestion
+        print("This is not a valid directory name: %s"%startdir_suggestion)
         return False
 
     VAR_HANDLETYPE = args.handletype
@@ -290,10 +290,10 @@ def clean_filmnames_in_folder(args):
     VAR_APPLY_SUGGESTIONS = args.apply
     VAR_LOG_VERBOSE = args.verbose
 
-    print ">>Scanning folder: %s"%VAR_STARTDIR
-    print ">>Handling filetypes: %s"%VAR_HANDLETYPE.upper()
-    print ">>Using filters: %s"%str(VAR_FILTER)
-    print ">>Will apply changes: %s"%VAR_APPLY_SUGGESTIONS
+    print(">>Scanning folder: %s"%VAR_STARTDIR)
+    print(">>Handling filetypes: %s"%VAR_HANDLETYPE.upper())
+    print(">>Using filters: %s"%str(VAR_FILTER))
+    print(">>Will apply changes: %s"%VAR_APPLY_SUGGESTIONS)
     summary = defaultdict(int)
     files = os.listdir(VAR_STARTDIR)
     for file in files:
@@ -312,13 +312,13 @@ def clean_filmnames_in_folder(args):
                         continue
                 summary[handle_dir(filename)] += 1
         else:
-            print "Don't know how to handle: %s"%filename
+            print("Don't know how to handle: %s"%filename)
 
-    print ">>Number of Items changed: %d"%summary[RESULT_CHANGED]
-    print ">>Number of Items identified to change: %d"%summary[RESULT_CHANGES_FOUND]
-    print ">>Number of Items not requiring changes: %d"%summary[RESULT_NO_CHANGES_FOUND]
-    print ">>Number of Items skipped: %d"%summary[RESULT_SKIPPED]
-    print ">>Number of Items failed: %d"%summary[RESULT_FAILED]
+    print(">>Number of Items changed: %d"%summary[RESULT_CHANGED])
+    print(">>Number of Items identified to change: %d"%summary[RESULT_CHANGES_FOUND])
+    print(">>Number of Items not requiring changes: %d"%summary[RESULT_NO_CHANGES_FOUND])
+    print(">>Number of Items skipped: %d"%summary[RESULT_SKIPPED])
+    print(">>Number of Items failed: %d"%summary[RESULT_FAILED])
 
     return True
         
@@ -339,7 +339,7 @@ def start():
     parser.add_argument('-v', dest='verbose', help='Output in _V_erbose mode.', action='store_true', default=False)
     args  = parser.parse_args()
 
-    print args
+    print(args)
 
     clean_filmnames_in_folder(args)        
 
